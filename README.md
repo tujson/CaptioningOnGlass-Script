@@ -1,4 +1,4 @@
-# CaptioningOnGlass
+# Captioning On Glass - Script
 https://cog.gatech.edu
 
 - Manually stepping through a script. 
