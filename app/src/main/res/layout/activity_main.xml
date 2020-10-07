@@ -14,27 +14,36 @@
         app:cameraAudio="off" />
 
     <!-- Glass XE for some some reason likes to resize things... -->
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/llBackground"
         android:layout_width="222dp"
-        android:layout_height="125dp"
+        android:layout_height="140dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_margin="12dp"
-        android:background="#90000000">
+        android:orientation="vertical"
+        android:weightSum="5">
 
-        <TextView
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="" />
-    </LinearLayout>
+            android:focusable="false"
+            android:layout_above="@id/tvRecognizing"
+            android:background="#90000000" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvText"
-        android:layout_width="222dp"
-        android:layout_height="125dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="12dp" />
+        <TextView
+            android:id="@+id/tvRecognizing"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:layout_alignParentBottom="true"
+            android:background="#90000000"
+            android:text="The quick brown fox"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            tools:text="Test" />
+    </RelativeLayout>
+
 
 </RelativeLayout>
