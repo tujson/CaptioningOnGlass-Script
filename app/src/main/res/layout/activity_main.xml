@@ -1,14 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <androidx.camera.view.PreviewView
-        android:id="@+id/previewView"
+    <com.otaliastudios.cameraview.CameraView
+        android:id="@+id/camera"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:keepScreenOn="true"
+        app:cameraAudio="off" />
+
+    <!-- Glass XE for some some reason likes to resize things... -->
+    <LinearLayout
+        android:id="@+id/llBackground"
+        android:layout_width="222dp"
+        android:layout_height="125dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="12dp"
+        android:background="#90000000">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="" />
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvText"
@@ -16,8 +35,6 @@
         android:layout_height="125dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_margin="12dp"
-        android:background="#90000000"
-        android:backgroundTint="@android:color/black" />
+        android:layout_margin="12dp" />
 
 </RelativeLayout>

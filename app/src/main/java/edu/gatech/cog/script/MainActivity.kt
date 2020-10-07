@@ -7,17 +7,12 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.PreviewView
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.android.synthetic.main.activity_main.*
 
+private val TAG = MainActivity::class.java.simpleName
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         layoutManager.stackFromEnd = true
         rvText.layoutManager = layoutManager
 
-        startCamera()
+        camera.setLifecycleOwner(this)
     }
 
     private fun loadScript(script: Int): Script {
@@ -97,42 +92,10 @@ class MainActivity : AppCompatActivity() {
         } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
             rvText.visibility =
                 if (rvText.visibility == View.VISIBLE) View.INVISIBLE else View.VISIBLE
+            llBackground.visibility =
+                if (llBackground.visibility == View.VISIBLE) View.INVISIBLE else View.VISIBLE
         }
 
         return super.onKeyDown(keyCode, event)
-    }
-
-    private fun startCamera() {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-
-        cameraProviderFuture.addListener({
-            // Used to bind the lifecycle of cameras to the lifecycle owner
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
-            val previewView: PreviewView = findViewById(R.id.previewView)
-            // Preview
-            val preview = Preview.Builder()
-                .build()
-                .also {
-                    it.setSurfaceProvider(previewView.surfaceProvider)
-                }
-
-            // Select back camera as a default
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
-            try {
-                // Unbind use cases before rebinding
-                cameraProvider.unbindAll()
-
-                // Bind use cases to camera
-                cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview
-                )
-
-            } catch (exc: Exception) {
-                Log.e("MainActivity", "Use case binding failed", exc)
-            }
-
-        }, ContextCompat.getMainExecutor(this))
     }
 }
