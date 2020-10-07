@@ -3,7 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="edu.gatech.cog.script">
 
+    <uses-feature android:name="android.hardware.camera.any" />
+
     <uses-permission android:name="com.google.android.glass.permission.DEVELOPMENT" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"

@@ -7,6 +7,12 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -17,12 +23,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var adapter: TextAdapter
     private lateinit var script: Script
-    private lateinit var training: Script
     private val displayedText = mutableListOf<String>()
 
     private var isScriptA = true
-    private var isReady = true
-    private var isTraining = false
 
     private var clickTime = System.currentTimeMillis()
 
@@ -32,7 +35,6 @@ class MainActivity : AppCompatActivity() {
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
         setContentView(R.layout.activity_main)
 
-        training = loadScript(R.raw.training)
         script = loadScript(R.raw.assemblya)
 
         adapter = TextAdapter(displayedText)
@@ -41,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         layoutManager.stackFromEnd = true
         rvText.layoutManager = layoutManager
 
-        tvText.setOnClickListener { switchScript() }
+        startCamera()
     }
 
     private fun loadScript(script: Int): Script {
@@ -75,29 +77,14 @@ class MainActivity : AppCompatActivity() {
                 clickTime = System.currentTimeMillis()
             }
             return true
-        } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_LEFT
-            || event?.keyCode == KeyEvent.KEYCODE_DPAD_RIGHT
+        } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_RIGHT
             || event?.keyCode == KeyEvent.KEYCODE_B
         ) {
             when {
                 script.currentIndex >= script.script.size -> {
-                    Toast.makeText(this, "Script finished.", Toast.LENGTH_SHORT).show()
-                }
-                isTraining && training.currentIndex >= training.script.size -> {
-                    isTraining = false
                     displayedText.clear()
                     adapter.notifyDataSetChanged()
-                }
-                isReady -> {
-                    tvText.text = ""
-                    isReady = false
-                    isTraining = true
-                }
-                isTraining -> {
-                    displayedText.add(training.script[training.currentIndex])
-                    adapter.notifyItemInserted(displayedText.size - 1)
-                    rvText.scrollToPosition(displayedText.size - 1)
-                    training.currentIndex++
+                    script.currentIndex = 0
                 }
                 else -> {
                     displayedText.add(script.script[script.currentIndex])
@@ -107,8 +94,45 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             return true
+        } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
+            rvText.visibility =
+                if (rvText.visibility == View.VISIBLE) View.INVISIBLE else View.VISIBLE
         }
 
         return super.onKeyDown(keyCode, event)
+    }
+
+    private fun startCamera() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+
+        cameraProviderFuture.addListener({
+            // Used to bind the lifecycle of cameras to the lifecycle owner
+            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+
+            val previewView: PreviewView = findViewById(R.id.previewView)
+            // Preview
+            val preview = Preview.Builder()
+                .build()
+                .also {
+                    it.setSurfaceProvider(previewView.surfaceProvider)
+                }
+
+            // Select back camera as a default
+            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+            try {
+                // Unbind use cases before rebinding
+                cameraProvider.unbindAll()
+
+                // Bind use cases to camera
+                cameraProvider.bindToLifecycle(
+                    this, cameraSelector, preview
+                )
+
+            } catch (exc: Exception) {
+                Log.e("MainActivity", "Use case binding failed", exc)
+            }
+
+        }, ContextCompat.getMainExecutor(this))
     }
 }
