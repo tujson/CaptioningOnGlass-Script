@@ -1,5 +1,6 @@
 package edu.gatech.cog.script
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
@@ -47,6 +48,7 @@ class MainActivity : AppCompatActivity() {
         rvText.layoutManager = layoutManager
 
         camera.setLifecycleOwner(this)
+        setColors()
     }
 
     private fun loadScript(script: Int): Script {
@@ -95,21 +97,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         Log.v("onKeyDown", "$keyCode $event")
-
-        when (event?.keyCode) {
-            KeyEvent.KEYCODE_DPAD_CENTER -> {
-                val clickDelta = System.currentTimeMillis() - clickTime
-                if (clickDelta <= 500L) {
-                    switchScript()
-                } else {
-                    clickTime = System.currentTimeMillis()
-                }
+        setColors()
+        if (event?.keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+            val clickDelta = System.currentTimeMillis() - clickTime
+            if (clickDelta <= 500L) {
+                switchScript()
+            } else {
+                clickTime = System.currentTimeMillis()
             }
-            KeyEvent.KEYCODE_DPAD_RIGHT -> advanceScript()
-            KeyEvent.KEYCODE_DPAD_LEFT -> switchOperatingMode()
-            KeyEvent.KEYCODE_B -> switchDisplayMode()
-            else -> return super.onKeyDown(keyCode, event)
-        }
+        } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_RIGHT || event?.keyCode == KeyEvent.KEYCODE_A) advanceScript()
+        else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_LEFT) switchOperatingMode()
+        else if (event?.keyCode == KeyEvent.KEYCODE_B) switchDisplayMode()
+        else return super.onKeyDown(keyCode, event)
         return true
     }
 
@@ -177,6 +176,16 @@ class MainActivity : AppCompatActivity() {
                 displayMode = 0
             }
         }
+    }
+
+    private fun setColors() {
+//        val rvTest = rvText.background
+//        val tvTest = tvRecognizing.background
+//        Log.v("MainActivity", "Alpha rv: ${rvTest.alpha}")
+//        Log.v("MainActivity", "Alpha tv: ${tvTest.alpha}")
+//        llBackground.setBackgroundColor(Color.parseColor("#90000000"))
+//        tvRecognizing.setBackgroundColor(Color.parseColor("#90000000"))
+//        rvText.setBackgroundColor(Color.parseColor("#90000000"))
     }
 
     override fun onResume() {

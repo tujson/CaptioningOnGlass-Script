@@ -13,6 +13,13 @@
         android:keepScreenOn="true"
         app:cameraAudio="off" />
 
+    <!-- Scapegoat view to capture focus -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clickable="true"
+        android:focusable="true" />
+
     <!-- Glass XE for some some reason likes to resize things... -->
     <RelativeLayout
         android:id="@+id/llBackground"
@@ -28,20 +35,19 @@
             android:id="@+id/rvText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:focusable="false"
             android:layout_above="@id/tvRecognizing"
-            android:background="#90000000" />
+            android:background="#90000000"
+            android:focusable="false" />
 
         <TextView
             android:id="@+id/tvRecognizing"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusable="false"
             android:layout_alignParentBottom="true"
             android:background="#90000000"
-            android:text="The quick brown fox"
             android:textColor="@android:color/white"
             android:textSize="16sp"
+            android:visibility="gone"
             tools:text="Test" />
     </RelativeLayout>
 
