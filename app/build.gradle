@@ -13,6 +13,13 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        def secureProps = new Properties()
+        if (file("../secure.properties").exists()) {
+            file("../secure.properties")?.withInputStream { secureProps.load(it) }
+        }
+        buildConfigField("String", "AZURE_SUBSCRIPTION_KEY", (secureProps.getProperty("AZURE_SUBSCRIPTION_KEY") ?: "\"\""))
+        buildConfigField("String", "AZURE_SERVICE_REGION", (secureProps.getProperty("AZURE_SERVICE_REGION") ?: "\"\""))
     }
     buildTypes {
         release {
