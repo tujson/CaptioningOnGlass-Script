@@ -95,6 +95,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         Log.v("onKeyDown", "$keyCode $event")
+
         when (event?.keyCode) {
             KeyEvent.KEYCODE_DPAD_CENTER -> {
                 val clickDelta = System.currentTimeMillis() - clickTime
@@ -103,76 +104,78 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     clickTime = System.currentTimeMillis()
                 }
-                return true
             }
-            KeyEvent.KEYCODE_DPAD_RIGHT -> {
-                if (!isSpeechRec) {
-                    when {
-                        script.currentIndex >= script.script.size -> {
-                            displayedText.clear()
-                            adapter.notifyDataSetChanged()
-                            script.currentIndex = 0
-                        }
-                        else -> {
-                            displayedText.add(script.script[script.currentIndex])
-                            adapter.notifyItemInserted(displayedText.size - 1)
-                            rvText.scrollToPosition(displayedText.size - 1)
-                            script.currentIndex++
-                        }
-                    }
-                }
-                return true
-            }
-            KeyEvent.KEYCODE_DPAD_LEFT -> {
-                // Switch between script and speech recognition
-                isSpeechRec = !isSpeechRec
-                displayedText.clear()
-                adapter.notifyDataSetChanged()
-
-                if (isSpeechRec) {
-                    tvRecognizing.visibility = View.VISIBLE
-                    speechRecognizer?.startContinuousRecognitionAsync()
-                } else {
-                    tvRecognizing.text = ""
-                    tvRecognizing.visibility = View.GONE
-                    script.currentIndex = 0
-                    speechRecognizer?.stopContinuousRecognitionAsync()
-                }
-                return true
-            }
-            KeyEvent.KEYCODE_B -> {
-                when (displayMode) {
-                    0 -> {
-                        // Go into Vuzix display mode
-                        llBackground.visibility = View.VISIBLE
-                        val layoutParams = RelativeLayout.LayoutParams(180, 200)
-                        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE)
-                        layoutParams.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-                        layoutParams.setMargins(0, 0, 100, 0)
-                        llBackground.layoutParams = layoutParams
-
-                        displayMode = 1
-                    }
-                    1 -> {
-                        // Go into Glass display mode
-                        val layoutParams = RelativeLayout.LayoutParams(222, 150)
-                        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE)
-                        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
-                        layoutParams.setMargins(12)
-                        llBackground.layoutParams = layoutParams
-
-                        displayMode = 2
-                    }
-                    2 -> {
-                        // Go into invisible display mode
-                        llBackground.visibility = View.INVISIBLE
-
-                        displayMode = 0
-                    }
-                }
-                return true
-            }
+            KeyEvent.KEYCODE_DPAD_RIGHT -> advanceScript()
+            KeyEvent.KEYCODE_DPAD_LEFT -> switchOperatingMode()
+            KeyEvent.KEYCODE_B -> switchDisplayMode()
             else -> return super.onKeyDown(keyCode, event)
+        }
+        return true
+    }
+
+    private fun advanceScript() {
+        if (!isSpeechRec) {
+            when {
+                script.currentIndex >= script.script.size -> {
+                    displayedText.clear()
+                    adapter.notifyDataSetChanged()
+                    script.currentIndex = 0
+                }
+                else -> {
+                    displayedText.add(script.script[script.currentIndex])
+                    adapter.notifyItemInserted(displayedText.size - 1)
+                    rvText.scrollToPosition(displayedText.size - 1)
+                    script.currentIndex++
+                }
+            }
+        }
+    }
+
+    private fun switchOperatingMode() {
+        isSpeechRec = !isSpeechRec
+        displayedText.clear()
+        adapter.notifyDataSetChanged()
+
+        if (isSpeechRec) {
+            tvRecognizing.visibility = View.VISIBLE
+            speechRecognizer?.startContinuousRecognitionAsync()
+        } else {
+            tvRecognizing.text = ""
+            tvRecognizing.visibility = View.GONE
+            script.currentIndex = 0
+            speechRecognizer?.stopContinuousRecognitionAsync()
+        }
+    }
+
+    private fun switchDisplayMode() {
+        when (displayMode) {
+            0 -> {
+                // Go into Vuzix display mode
+                llBackground.visibility = View.VISIBLE
+                val layoutParams = RelativeLayout.LayoutParams(180, 200)
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE)
+                layoutParams.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+                layoutParams.setMargins(0, 0, 100, 0)
+                llBackground.layoutParams = layoutParams
+
+                displayMode = 1
+            }
+            1 -> {
+                // Go into Glass display mode
+                val layoutParams = RelativeLayout.LayoutParams(222, 150)
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE)
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
+                layoutParams.setMargins(12)
+                llBackground.layoutParams = layoutParams
+
+                displayMode = 2
+            }
+            2 -> {
+                // Go into invisible display mode
+                llBackground.visibility = View.INVISIBLE
+
+                displayMode = 0
+            }
         }
     }
 
